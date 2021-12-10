@@ -13,14 +13,16 @@ class LoginProvider extends ChangeNotifier {
     x = {};
   }
   init() async {
-    await setSharedPreference();
+    await setSharedPreference().whenComplete(() {
+      getSharedPreference();
+    });
   }
 
-  setSharedPreference() async {
+  Future setSharedPreference() async {
     await LoginSharedPref().addStringToSF();
   }
 
-  getSharedPreference() async {
+  Future getSharedPreference() async {
     x = await LoginSharedPref().getStringValuesSF();
     print(x['Name']);
     print(x['Password']);
@@ -38,13 +40,17 @@ class LoginProvider extends ChangeNotifier {
         const SnackBar(content: Text('Processing Data')),
       );
     }
-    getSharedPreference();
+    getSharedPreference().whenComplete(() {
+      callMe(context);
+    });
     // print('hello');
     // print(x['Name']);
     // print(x['Password']);
     // print(text1.text);
     // print(text2.text);
+  }
 
+  callMe(context) async {
     if (x['Name'] == text1.text && x['Password'] == text2.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Valid Username and Password')),
